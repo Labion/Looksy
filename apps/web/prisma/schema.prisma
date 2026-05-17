@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ExhibitionSession {
+  id                String        @id @default(cuid())
+  title             String
+  venue             String?
+  city              String?
+  visitDate         DateTime?
+  exhibitionType    String?
+  keywords          String        @default("[]")
+  overallImpression String?
+  curatorialNotes   String?
+  spatialNotes      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  notes             ExhibitNote[]
+}
+
+model ExhibitNote {
+  id                    String             @id @default(cuid())
+  exhibitionSessionId   String
+  exhibitionSession     ExhibitionSession  @relation(fields: [exhibitionSessionId], references: [id], onDelete: Cascade)
+  sequenceNumber        Int
+  title                 String?
+  artist                String?
+  yearOrPeriod          String?
+  mediumOrMaterial      String?
+  wallLabelText         String?
+  manualContext         String?
+  confirmedFacts        String?
+  visualObservations    String?
+  reasonableSpeculation String?
+  viewingFocus          String?
+  aiAnalysis            String?
+  designInspiration     String?
+  oneSentenceSummary    String?
+  personalRemarks       String?
+  followUpQuestions     String             @default("[]")
+  informationConfidence String             @default("partial")
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  images                ExhibitImage[]
+
+  @@index([exhibitionSessionId, sequenceNumber])
+}
+
+model ExhibitImage {
+  id               String      @id @default(cuid())
+  exhibitNoteId    String
+  exhibitNote      ExhibitNote @relation(fields: [exhibitNoteId], references: [id], onDelete: Cascade)
+  filePath         String
+  originalFilename String?
+  mimeType         String?
+  width            Int?
+  height           Int?
+  imageRole        String      @default("artwork")
+  createdAt        DateTime    @default(now())
+
+  @@index([exhibitNoteId])
+}
