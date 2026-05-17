@@ -2,6 +2,8 @@
 
 Mobile-first Next.js prototype for Looksy（中文概念名：看展搭子）.
 
+For user deployment and usage instructions, read the repository root `README.md`. For Codex / development collaboration context, read the repository root `CODEX_NOTES.md`.
+
 ## Current Scope
 
 This app now includes local SQLite persistence for exhibition sessions, text exhibit notes, local image upload, deterministic mock AI analysis, optional OpenAI analysis, and Markdown export. It does not implement hosted sync yet.

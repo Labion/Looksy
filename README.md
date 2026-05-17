@@ -1,62 +1,24 @@
-# Looksy
+# Looksy（看展搭子）
 
-Looksy（中文概念名：看展搭子）is a personal AI exhibition companion for art exhibitions, museums, architecture exhibitions, design shows, urban renewal exhibitions, and commercial exhibition spaces.
+Looksy 是一个个人 AI 看展笔记 Web App，用来在美术馆、博物馆、建筑展、设计展、城市更新展和公共空间观察中记录展品、展签、现场观察、AI 分析和个人灵感。
 
-This project is intentionally lightweight. It is not a commercial museum SaaS and not a custom hardware product.
+它是个人本地优先工具，不是商业 SaaS、博物馆 CMS 或硬件项目。
 
-## Goal
+## 部署与环境要求
 
-Create a private mobile-first web tool that helps the user:
+当前项目已在 Windows 环境验证：
 
-- Start an exhibition visit session.
-- Capture artwork / exhibit / wall-label photos.
-- Ask AI for structured analysis.
-- Save personal exhibit notes.
-- Extract architecture, urban, exhibition-design, material, and product inspiration.
-- Export notes to Markdown for Obsidian / Notion / personal archives.
+- Node.js：建议 `>= 24`，已验证 `v24.15.0`
+- npm：建议 `>= 11`，已验证 `11.12.1`
+- Shell：Windows PowerShell
+- 数据库：SQLite，本地文件存储，无需云服务
+- 浏览器：任意现代桌面或手机浏览器
 
-## Recommended MVP Stack
+Windows PowerShell 中建议使用 `npm.cmd`，避免执行策略拦截 `npm.ps1`。
 
-- Next.js
-- TypeScript
-- React
-- Tailwind CSS
-- SQLite + Prisma or Drizzle
-- OpenAI / Gemini provider abstraction
-- Markdown export
+## 本地部署与启动
 
-## Repository Structure
-
-```text
-.
-├── AGENTS.md
-├── README.md
-├── .env.example
-├── docs/
-│   ├── PRODUCT_SPEC.md
-│   ├── ARCHITECTURE.md
-│   ├── DATA_MODEL.md
-│   ├── ROADMAP.md
-│   ├── MVP_TASKS.md
-│   └── PROMPT_SYSTEM.md
-├── codex_prompts/
-│   ├── 01_bootstrap.md
-│   ├── 02_data_model.md
-│   ├── 03_ai_analysis.md
-│   ├── 04_markdown_export.md
-│   └── 05_mobile_polish.md
-├── apps/
-│   └── web/
-├── packages/
-│   └── core/
-├── data/
-│   └── samples/
-└── scripts/
-```
-
-## Web App
-
-The first runnable prototype lives in `apps/web`.
+从仓库根目录执行：
 
 ```powershell
 cd apps/web
@@ -68,31 +30,33 @@ npm.cmd run db:seed
 npm.cmd run dev
 ```
 
-Then open `http://localhost:3000`.
+启动后打开：
 
-For a production sanity check:
-
-```powershell
-npm.cmd run verify
+```text
+http://localhost:3000
 ```
 
-On Windows PowerShell, use `npm.cmd` instead of `npm` if execution policy blocks `npm.ps1`.
+如果想在局域网手机上测试，需要让开发服务器监听局域网地址，并确认防火墙允许访问。
 
-Current prototype scope: mobile-first session and text-note CRUD with local SQLite, local image upload, deterministic mock AI analysis, optional OpenAI analysis, and Markdown export.
+## 环境变量
 
-The current Windows development environment has been verified with Node.js `v24.15.0` and npm `11.12.1`.
+Web App 的环境变量文件位于：
 
-`verify` runs database generation, migration, seed, production build, and then typecheck in order.
+```text
+apps/web/.env
+```
 
-## AI Provider
-
-The default provider is deterministic and local:
+基础配置：
 
 ```env
+DATABASE_URL="file:./dev.db"
+NEXT_PUBLIC_APP_NAME="Looksy"
 AI_PROVIDER=mock
 ```
 
-To call OpenAI when tapping `生成分析`, set:
+默认 `AI_PROVIDER=mock`，会使用本地 deterministic mock 分析，不会调用 OpenAI，也不会产生 API 成本。
+
+如需使用 OpenAI：
 
 ```env
 AI_PROVIDER=openai
@@ -100,24 +64,185 @@ OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-5.5
 ```
 
-Uploaded images are only sent to OpenAI when you explicitly generate analysis for a note. Missing `OPENAI_API_KEY` produces an on-page error and does not overwrite existing analysis fields.
+图片和文本只会在你点击 `生成分析` 时发送给 OpenAI。缺少 API key 时，页面会显示错误，并且不会覆盖已有分析内容。
 
-## How to Use with Codex
+## 使用流程
 
-1. Create a new Git repository.
-2. Copy this framework into the repository root.
-3. Open the repo in Codex CLI or Codex cloud.
-4. Ask Codex to read `AGENTS.md` and `docs/` first.
-5. Start with `codex_prompts/01_bootstrap.md`.
+1. 打开首页。
+2. 点击或填写 `新建看展记录`。
+3. 输入展览标题、场馆、城市、日期、类型和关键词。
+4. 进入看展记录详情页。
+5. 添加展品笔记：
+   - 标题
+   - 展签文字
+   - 现场观察
+   - 个人备注
+6. 在笔记下上传展品照片、展签照片、展厅场景或细节图。
+7. 选择分析模式并点击 `生成分析`。
+8. 查看结构化中文分析。
+9. 点击 `导出 Markdown`，保存到 Obsidian 或其他个人知识库。
 
-## Suggested First Codex Prompt
+## AI 分析模式
+
+当前支持：
+
+- 默认看展分析
+- 展签解读
+- 展陈空间分析
+- 建筑 / 城市 / 材料启发
+- 快速笔记
+- 深度复盘
+
+AI 输出会尽量区分：
+
+- 确定信息
+- 基于记录的观察
+- 合理推测
+- 需要继续核实的信息
+
+## Markdown / Obsidian 导出
+
+在任意看展记录详情页点击：
 
 ```text
-请先阅读 AGENTS.md、README.md 和 docs/ 下的所有文档。
+导出 Markdown
+```
 
-目标：为 Looksy（中文概念名：看展搭子）创建第一个可运行的个人 Web App 原型。
+导出内容包括：
 
-请只执行 codex_prompts/01_bootstrap.md 中的任务。
-不要实现复杂 AI、不要做商业化后台、不要做硬件。
-完成后说明改了哪些文件、如何运行、如何测试、下一步建议。
+- 展览基本信息
+- 展览整体印象
+- 策展备注
+- 空间 / 展陈观察
+- 展品笔记
+- 图片链接
+- AI 分析
+- 个人备注
+- 建筑 / 城市 / 展陈 / 设计启发
+- 后续追问
+
+## 数据与文件位置
+
+主要数据位置：
+
+- SQLite 数据库：`apps/web/prisma/dev.db`
+- Prisma schema：`apps/web/prisma/schema.prisma`
+- Prisma migrations：`apps/web/prisma/migrations/`
+- 上传图片：`apps/web/public/uploads/exhibit-images/`
+- Markdown 导出路由：`/sessions/[id]/export`
+
+`dev.db` 和上传图片属于本地开发数据，不建议作为长期源码资产提交。
+
+## 验证与 Smoke Test
+
+稳定性检查：
+
+```powershell
+cd apps/web
+npm.cmd run verify
+```
+
+`verify` 会按顺序执行：
+
+```text
+db:generate
+db:migrate
+db:seed
+build
+typecheck
+```
+
+手动 Smoke Test：
+
+1. 打开 `http://localhost:3000`。
+2. 创建一个看展记录。
+3. 添加一条展品笔记。
+4. 上传一张图片。
+5. 点击 `生成分析`。
+6. 点击 `导出 Markdown`。
+7. 确认导出的 Markdown 包含展览信息、笔记内容、图片链接、AI 分析、设计启发和后续追问。
+
+## 常见问题
+
+### npm 被 PowerShell 拦截
+
+使用：
+
+```powershell
+npm.cmd run dev
+```
+
+而不是：
+
+```powershell
+npm run dev
+```
+
+### npm registry 或代理失败
+
+如果使用本地代理，例如 `127.0.0.1:20080`：
+
+```powershell
+npm.cmd config set proxy http://127.0.0.1:20080
+npm.cmd config set https-proxy http://127.0.0.1:20080
+npm.cmd config set registry https://registry.npmjs.org/
+```
+
+如果 npmjs 访问不稳定，可以改用镜像：
+
+```powershell
+npm.cmd config set registry https://registry.npmmirror.com
+```
+
+### 数据库需要重建
+
+本地开发环境可以删除 `apps/web/prisma/dev.db` 后重新执行：
+
+```powershell
+cd apps/web
+npm.cmd run db:migrate
+npm.cmd run db:seed
+```
+
+删除数据库会丢失本地测试数据。
+
+### OpenAI 分析报错
+
+确认 `.env` 中有：
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=sk-...
+```
+
+如果只是本地测试，请改回：
+
+```env
+AI_PROVIDER=mock
+```
+
+## 项目结构
+
+```text
+.
+├── README.md              用户部署与使用说明
+├── CODEX_NOTES.md         Codex / 开发协作说明
+├── HANDOFF.md             当前交接状态
+├── AGENTS.md              Codex 工作规则
+├── docs/                  产品、架构、数据模型和路线文档
+├── codex_prompts/         分阶段 Codex 提示词
+└── apps/
+    └── web/               Next.js Web App
+```
+
+Web App 关键目录：
+
+```text
+apps/web/app/              页面和 server actions
+apps/web/lib/db/           Prisma 数据访问
+apps/web/lib/ai/           AI provider 与 prompt
+apps/web/lib/export/       Markdown 导出
+apps/web/lib/uploads/      本地图片上传
+apps/web/prisma/           SQLite schema、migration、seed
+apps/web/types/            TypeScript 类型
 ```
