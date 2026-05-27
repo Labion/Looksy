@@ -24,10 +24,16 @@ export async function GET(_request: Request, { params }: ExportRouteProps) {
 
   const notes = await listExhibitNotesBySession(session.id);
   const imageEntries = await Promise.all(
-    notes.map(async (note) => [note.id, await listExhibitImagesByNote(note.id)] as const)
+    notes.map(async (note) => [
+      note.id,
+      await listExhibitImagesByNote(note.id)
+    ] as const)
   );
-  const imagesByNoteId = Object.fromEntries(imageEntries);
-  const markdown = exportSessionToMarkdown({ session, notes, imagesByNoteId });
+  const markdown = exportSessionToMarkdown({
+    session,
+    notes,
+    imagesByNoteId: Object.fromEntries(imageEntries)
+  });
   const filename = markdownFilename(session.title);
 
   return new Response(markdown, {

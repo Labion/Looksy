@@ -61,12 +61,13 @@ export async function createExhibitionSessionAction(formData: FormData) {
 
 export async function createExhibitNoteAction(formData: FormData) {
   const exhibitionSessionId = textValue(formData, "exhibitionSessionId");
+  const redirectTo = textValue(formData, "redirectTo");
 
   if (!exhibitionSessionId) {
     redirect("/");
   }
 
-  await createExhibitNote({
+  const note = await createExhibitNote({
     exhibitionSessionId,
     title: textValue(formData, "title"),
     artist: textValue(formData, "artist"),
@@ -78,6 +79,9 @@ export async function createExhibitNoteAction(formData: FormData) {
   });
 
   revalidatePath(`/sessions/${exhibitionSessionId}`);
+  if (redirectTo === "item") {
+    redirect(`/items/${note.id}`);
+  }
   redirect(`/sessions/${exhibitionSessionId}`);
 }
 

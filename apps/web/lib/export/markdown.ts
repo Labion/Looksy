@@ -6,6 +6,12 @@ type ExportSessionToMarkdownInput = {
   imagesByNoteId?: Record<string, ExhibitImage[]>;
 };
 
+type ExportNoteToMarkdownInput = {
+  session: ExhibitionSession;
+  note: ExhibitNote;
+  images?: ExhibitImage[];
+};
+
 function text(value: string | undefined, fallback = "") {
   return value?.trim() || fallback;
 }
@@ -79,6 +85,45 @@ function noteSection(note: ExhibitNote, images: ExhibitImage[] | undefined) {
   return lines.filter(Boolean).join("\n").trim();
 }
 
+export function exportNoteToMarkdown({
+  session,
+  note,
+  images = []
+}: ExportNoteToMarkdownInput) {
+  const title = text(note.title, "未命名展品笔记");
+  const content = [
+    `# 展品笔记：${title}`,
+    "",
+    "## 基本信息",
+    "",
+    `- 所属展览：${session.title}`,
+    `- 展馆：${text(session.venue, "未记录")}`,
+    `- 城市：${text(session.city, "未记录")}`,
+    `- 作者：${text(note.artist, "未记录")}`,
+    `- 年代：${text(note.yearOrPeriod, "未记录")}`,
+    `- 材料：${text(note.mediumOrMaterial, "未记录")}`,
+    `- 信息确定程度：${note.informationConfidence}`,
+    "",
+    section("展签 / 现场信息", note.wallLabelText),
+    imageSection(images).replace("#### 图片", "## 图片"),
+    section("现场观看重点", note.viewingFocus),
+    section("AI 赏析", note.aiAnalysis),
+    section("建筑 / 城市 / 展陈 / 设计启发", note.designInspiration),
+    section("我的个人备注", note.personalRemarks),
+    note.followUpQuestions.length > 0
+      ? `## 后续可追问问题\n\n${note.followUpQuestions
+          .map((question) => `- ${question}`)
+          .join("\n")}\n`
+      : ""
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  return `${content}\n`;
+}
+
 export function exportSessionToMarkdown({
   session,
   notes,
@@ -142,4 +187,14 @@ export function markdownFilename(title: string) {
     .slice(0, 80);
 
   return `${safeTitle || "looksy-session"}.md`;
+}
+
+export function noteMarkdownFilename(title: string | undefined) {
+  const safeTitle = (title ?? "looksy-note")
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, "-")
+    .slice(0, 80);
+
+  return `${safeTitle || "looksy-note"}.md`;
 }

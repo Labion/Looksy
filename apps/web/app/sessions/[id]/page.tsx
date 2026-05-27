@@ -112,7 +112,7 @@ export default async function SessionPage({
           ) : null}
           <a
             className="mt-5 flex min-h-12 w-full items-center justify-center rounded-lg bg-ink px-5 py-3 text-base font-semibold text-white shadow-soft transition hover:bg-moss"
-            href="#add-note"
+            href={`/items/new?sessionId=${session.id}`}
           >
             添加展品笔记
           </a>
@@ -253,6 +253,20 @@ export default async function SessionPage({
                   <h3 className="mt-1 text-base font-semibold">
                     {note.title ?? "未命名展品笔记"}
                   </h3>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      className="rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-semibold text-ink transition hover:border-moss hover:text-moss"
+                      href={`/items/${note.id}`}
+                    >
+                      打开详情
+                    </Link>
+                    <Link
+                      className="rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-semibold text-ink transition hover:border-moss hover:text-moss"
+                      href={`/items/${note.id}/export`}
+                    >
+                      导出单条
+                    </Link>
+                  </div>
                   {[note.artist, note.yearOrPeriod, note.mediumOrMaterial].some(
                     Boolean
                   ) ? (

@@ -30,7 +30,8 @@ This environment has been verified with Node.js `v24.15.0` and npm `11.12.1`.
 3. Capture the minimum useful text first: title, wall-label text,现场观察, and personal remarks.
 4. Upload exhibit photos or wall-label photos under the note.
 5. Choose an analysis mode on a note card and tap `生成分析`.
-6. Tap `导出 Markdown` from the session header to download an Obsidian-friendly `.md` file.
+6. Tap `导出 Markdown` from the session header to preview, copy, or download an Obsidian-friendly full-session `.md` file.
+7. Open an exhibit note detail page and tap `导出单条 Markdown` to export just that note.
 
 ## Local Uploads
 
@@ -71,8 +72,9 @@ After `npm.cmd run dev`:
 3. Add one exhibit note.
 4. Upload one exhibit image.
 5. Generate mock AI analysis.
-6. Export Markdown.
-7. Confirm the exported Markdown includes metadata, note content, AI analysis, design inspiration, follow-up questions, and image links.
+6. Export a single note Markdown from `/items/[id]/export`.
+7. Export the full session Markdown from `/sessions/[id]/export`.
+8. Confirm the exported Markdown can be copied and downloaded, and includes metadata, note content, AI analysis, design inspiration, follow-up questions, and image links.
 
 On Windows PowerShell, use `npm.cmd` instead of `npm` if execution policy blocks `npm.ps1`.
 
@@ -94,3 +96,5 @@ npm.cmd run db:studio
 - `prisma/` - SQLite schema and deterministic seed data.
 - `data/sample-session-export.md` - deterministic sample Markdown export.
 - `public/uploads/exhibit-images/` - local uploaded exhibit images.
+
+MVP route aliases from the goal pack are supported: `/exhibitions`, `/exhibitions/new`, `/exhibitions/[id]`, `/items/new`, and `/items/[id]`.
